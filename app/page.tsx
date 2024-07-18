@@ -1,113 +1,180 @@
-import Image from "next/image";
+'use client'
+import { useState, useEffect } from 'react';
+import styles from '../styles/Home.module.css';
+
+interface ContributionData {
+  day: string;
+  value: number;
+}
+
+const generateData = (level: number): ContributionData[] => {
+  const today = new Date();
+  const data: ContributionData[] = [];
+  for (let i = 0; i < 365; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    let value = Math.round(Math.random() * level);
+    if (level === 1 && Math.random() < 0.7) {
+      value = 0; // 70% chance of having an empty day for level 1
+    } else if (level === 9 || level === 10) {
+      value = Math.max(1, value); // Ensure there are no empty days for levels 9 and 10
+    }
+    data.push({
+      day: date.toISOString().split('T')[0],
+      value: value,
+    });
+  }
+  return data;
+};
+
+const getColor = (value: number, darkMode: boolean): string => {
+  if (value === 0) return darkMode ? '#2d333b' : '#ebedf0';
+  if (value === 1) return darkMode ? '#0e4429' : '#9be9a8';
+  if (value === 2) return darkMode ? '#006d32' : '#40c463';
+  if (value === 3) return darkMode ? '#26a641' : '#30a14e';
+  return darkMode ? '#39d353' : '#216e39';
+};
+
+const getMonthLabel = (monthIndex: number): string => {
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return monthNames[monthIndex];
+};
+
+const groupDataByWeeks = (data: ContributionData[]): { [key: string]: ContributionData[][] } => {
+  const weeksByMonth: { [key: string]: ContributionData[][] } = {};
+  let currentWeek: ContributionData[] = [];
+
+  data.forEach((entry) => {
+    const date = new Date(entry.day);
+    const dayOfWeek = date.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+
+    // Start a new week on Monday
+    if (dayOfWeek === 1 || currentWeek.length === 7) {
+      if (currentWeek.length) {
+        if (!weeksByMonth[monthKey]) {
+          weeksByMonth[monthKey] = [];
+        }
+        weeksByMonth[monthKey].push(currentWeek);
+      }
+      currentWeek = [];
+    }
+    currentWeek.push(entry);
+  });
+
+  if (currentWeek.length) {
+    const date = new Date(currentWeek[0].day);
+    const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+    if (!weeksByMonth[monthKey]) {
+      weeksByMonth[monthKey] = [];
+    }
+    weeksByMonth[monthKey].push(currentWeek);
+  }
+
+  // Ensure each week has 7 days, filling with empty days if necessary
+  Object.keys(weeksByMonth).forEach((monthKey) => {
+    weeksByMonth[monthKey].forEach((week) => {
+      while (week.length < 7) {
+        week.push({ day: '', value: 0 });
+      }
+    });
+  });
+
+  return weeksByMonth;
+};
 
 export default function Home() {
+  const [level, setLevel] = useState<number>(1);
+  const [data, setData] = useState<ContributionData[]>([]);
+  const [weeksByMonth, setWeeksByMonth] = useState<{ [key: string]: ContributionData[][] }>({});
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    const newData = generateData(level);
+    setData(newData);
+    const newWeeksByMonth = groupDataByWeeks(newData);
+    setWeeksByMonth(newWeeksByMonth);
+  }, [level]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newLevel = parseInt(event.target.value);
+    setLevel(newLevel);
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode((prevMode) => !prevMode);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className={`container ${darkMode ? 'dark' : ''}`}>
+      <div className="content">
+        <h1>GitHub Contributions Chart</h1>
+        <label htmlFor="level">Coding Level (1-10):</label>
+        <input
+          type="number"
+          id="level"
+          name="level"
+          min="1"
+          max="10"
+          value={level}
+          onChange={handleChange}
+        />
+        <button
+          onClick={toggleDarkMode}
+          className="mt-2 p-2 bg-blue-500 text-white rounded-md"
+        >
+          {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        </button>
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                {Object.keys(weeksByMonth)
+                  .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                  .map((monthKey) => {
+                    const monthIndex = parseInt(monthKey.split('-')[1], 10) - 1;
+                    return (
+                      <th key={monthKey} colSpan={weeksByMonth[monthKey].length}>
+                        {getMonthLabel(monthIndex)}
+                      </th>
+                    );
+                  })}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {Object.keys(weeksByMonth)
+                  .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                  .flatMap((monthKey) =>
+                    weeksByMonth[monthKey].map((week, weekIndex) => (
+                      <td key={`${monthKey}-${weekIndex}`} className={styles.weekCell}>
+                        <div className={styles.weekGrid}>
+                          {week.map((day, dayIndex) => (
+                            <div
+                              key={dayIndex}
+                              className={styles.dayCell}
+                              style={{ backgroundColor: getColor(day.value, darkMode) }}
+                              title={`Date: ${day.day}, Contributions: ${day.value}`}
+                            ></div>
+                          ))}
+                        </div>
+                      </td>
+                    ))
+                  )}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className={styles.legend}>
+          <span>Less</span>
+          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#2d333b' : '#ebedf0' }}></div>
+          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#0e4429' : '#9be9a8' }}></div>
+          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#006d32' : '#40c463' }}></div>
+          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#26a641' : '#30a14e' }}></div>
+          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#39d353' : '#216e39' }}></div>
+          <span>More</span>
         </div>
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
