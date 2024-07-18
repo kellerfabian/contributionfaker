@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import html2canvas from "html2canvas";
 import styles from "./ContributionChart.module.css";
 
 interface ContributionData {
@@ -129,21 +128,9 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
     setWeeksByMonth(newWeeksByMonth);
   }, [level]);
 
-  const handleScreenshot = () => {
-    const chartElement = document.getElementById("contribution-chart");
-    if (chartElement) {
-      html2canvas(chartElement).then((canvas) => {
-        const link = document.createElement("a");
-        link.download = "contribution-chart.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      });
-    }
-  };
 
   return (
     <div>
-      <button onClick={handleScreenshot}>Take Screenshot</button>
       <div
         id="contribution-chart"
         className={`p-3 ${styles.tableContainer} ${
