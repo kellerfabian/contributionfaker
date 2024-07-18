@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import html2canvas from "html2canvas";
 import styles from "./ContributionChart.module.css";
 
 interface ContributionData {
@@ -128,91 +129,107 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
     setWeeksByMonth(newWeeksByMonth);
   }, [level]);
 
-  return (
-    <div
-      className={`p-3 ${styles.tableContainer} ${
-        darkMode ? styles.tableDark : styles.tableLight
-      } rounded-md`}
-    >
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            {Object.keys(weeksByMonth)
-              .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-              .map((monthKey) => {
-                const monthIndex = parseInt(monthKey.split("-")[1], 10) - 1;
-                return (
-                  <th
-                    key={monthKey}
-                    colSpan={weeksByMonth[monthKey].length}
-                    className={
-                      darkMode
-                        ? styles.monthHeaderDark
-                        : styles.monthHeaderLight
-                    }
-                  >
-                    {getMonthLabel(monthIndex)}
-                  </th>
-                );
-              })}
-          </tr>
-        </thead>
+  const handleScreenshot = () => {
+    const chartElement = document.getElementById("contribution-chart");
+    if (chartElement) {
+      html2canvas(chartElement).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "contribution-chart.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  };
 
-        <tbody>
-          <tr>
-            {Object.keys(weeksByMonth)
-              .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-              .flatMap((monthKey) =>
-                weeksByMonth[monthKey].map((week, weekIndex) => (
-                  <td
-                    key={`${monthKey}-${weekIndex}`}
-                    className={styles.weekCell}
-                  >
-                    <div className={styles.weekGrid}>
-                      {week.map((day, dayIndex) => (
-                        <div
-                          key={dayIndex}
-                          className={styles.dayCell}
-                          style={{
-                            backgroundColor: getColor(day.value, darkMode),
-                          }}
-                          title={`Date: ${day.day}, Contributions: ${day.value}`}
-                        ></div>
-                      ))}
-                    </div>
-                  </td>
-                ))
-              )}
-          </tr>
-        </tbody>
-      </table>
+  return (
+    <div>
+      <button onClick={handleScreenshot}>Take Screenshot</button>
       <div
-        className={`m-3 ${styles.legend} ${
-          darkMode ? styles.monthHeaderDark : styles.monthHeaderLight
-        }`}
+        id="contribution-chart"
+        className={`p-3 ${styles.tableContainer} ${
+          darkMode ? styles.tableDark : styles.tableLight
+        } rounded-md`}
       >
-        <span>Less</span>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              {Object.keys(weeksByMonth)
+                .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                .map((monthKey) => {
+                  const monthIndex = parseInt(monthKey.split("-")[1], 10) - 1;
+                  return (
+                    <th
+                      key={monthKey}
+                      colSpan={weeksByMonth[monthKey].length}
+                      className={
+                        darkMode
+                          ? styles.monthHeaderDark
+                          : styles.monthHeaderLight
+                      }
+                    >
+                      {getMonthLabel(monthIndex)}
+                    </th>
+                  );
+                })}
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              {Object.keys(weeksByMonth)
+                .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                .flatMap((monthKey) =>
+                  weeksByMonth[monthKey].map((week, weekIndex) => (
+                    <td
+                      key={`${monthKey}-${weekIndex}`}
+                      className={styles.weekCell}
+                    >
+                      <div className={styles.weekGrid}>
+                        {week.map((day, dayIndex) => (
+                          <div
+                            key={dayIndex}
+                            className={styles.dayCell}
+                            style={{
+                              backgroundColor: getColor(day.value, darkMode),
+                            }}
+                            title={`Date: ${day.day}, Contributions: ${day.value}`}
+                          ></div>
+                        ))}
+                      </div>
+                    </td>
+                  ))
+                )}
+            </tr>
+          </tbody>
+        </table>
         <div
-          className={styles.legendColor}
-          style={{ backgroundColor: darkMode ? "#2d333b" : "#ebedf0" }}
-        ></div>
-        <div
-          className={styles.legendColor}
-          style={{ backgroundColor: darkMode ? "#0e4429" : "#9be9a8" }}
-        ></div>
-        <div
-          className={styles.legendColor}
-          style={{ backgroundColor: darkMode ? "#006d32" : "#40c463" }}
-        ></div>
-        <div
-          className={styles.legendColor}
-          style={{ backgroundColor: darkMode ? "#26a641" : "#30a14e" }}
-        ></div>
-        <div
-          className={styles.legendColor}
-          style={{ backgroundColor: darkMode ? "#39d353" : "#216e39" }}
-        ></div>
-        <span>More</span>
+          className={`m-3 ${styles.legend} ${
+            darkMode ? styles.monthHeaderDark : styles.monthHeaderLight
+          }`}
+        >
+          <span>Less</span>
+          <div
+            className={styles.legendColor}
+            style={{ backgroundColor: darkMode ? "#2d333b" : "#ebedf0" }}
+          ></div>
+          <div
+            className={styles.legendColor}
+            style={{ backgroundColor: darkMode ? "#0e4429" : "#9be9a8" }}
+          ></div>
+          <div
+            className={styles.legendColor}
+            style={{ backgroundColor: darkMode ? "#006d32" : "#40c463" }}
+          ></div>
+          <div
+            className={styles.legendColor}
+            style={{ backgroundColor: darkMode ? "#26a641" : "#30a14e" }}
+          ></div>
+          <div
+            className={styles.legendColor}
+            style={{ backgroundColor: darkMode ? "#39d353" : "#216e39" }}
+          ></div>
+          <span>More</span>
+        </div>
       </div>
     </div>
   );
