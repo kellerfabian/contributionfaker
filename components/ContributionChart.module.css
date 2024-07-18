@@ -68,7 +68,7 @@
 .legend {
   display: flex;
   align-items: center;
-  margin-left: auto; /* Align to the right */
+  justify-content: flex-end; /* Align to the right */
   font-size: 12px; /* Smaller font size */
 }
 
@@ -82,6 +82,7 @@
   margin: 0 2px;
   /* border: 1px solid #ddd; */
 }
+
 
 .tableLight {
   background-color: white;

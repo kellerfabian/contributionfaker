@@ -57,20 +57,20 @@ const Home = () => {
           onChange={handleChange}
         />
 
-<div className="flex space-x-4 mt-2">
-        <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+        <div className="flex space-x-4 mt-2">
+          <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
 
-        <button
-          onClick={handleScreenshot}
-          className="mt-2 p-2 bg-blue-500 text-white rounded-md flex items-center"
-        >
-          Download Chart
-        </button>
+          <button
+            onClick={handleScreenshot}
+            className="mt-2 p-2 bg-blue-500 text-white rounded-md flex items-center"
+          >
+            Download Chart
+          </button>
         </div>
 
         <ContributionChart level={level} darkMode={darkMode} />
       </div>
-      <div className="footer">
+      <div className="footer  text-gray-500">
         <p>
           Made with ☕ by <a href="https://x.com/sailing_dev">Sailing_dev</a>
         </p>
