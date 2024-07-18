@@ -1,7 +1,7 @@
-'use client'
-import { useState, useEffect } from 'react';
-import styles from '../styles/Home.module.css';
-
+"use client";
+import { useState, useEffect } from "react";
+import styles from "../styles/Home.module.css";
+import DarkModeToggle from "./DarkModeToggle";
 interface ContributionData {
   day: string;
   value: number;
@@ -20,7 +20,7 @@ const generateData = (level: number): ContributionData[] => {
       value = Math.max(1, value); // Ensure there are no empty days for levels 9 and 10
     }
     data.push({
-      day: date.toISOString().split('T')[0],
+      day: date.toISOString().split("T")[0],
       value: value,
     });
   }
@@ -28,19 +28,34 @@ const generateData = (level: number): ContributionData[] => {
 };
 
 const getColor = (value: number, darkMode: boolean): string => {
-  if (value === 0) return darkMode ? '#2d333b' : '#ebedf0';
-  if (value === 1) return darkMode ? '#0e4429' : '#9be9a8';
-  if (value === 2) return darkMode ? '#006d32' : '#40c463';
-  if (value === 3) return darkMode ? '#26a641' : '#30a14e';
-  return darkMode ? '#39d353' : '#216e39';
+  if (value === 0) return darkMode ? "#2d333b" : "#ebedf0";
+  if (value === 1) return darkMode ? "#0e4429" : "#9be9a8";
+  if (value === 2) return darkMode ? "#006d32" : "#40c463";
+  if (value === 3) return darkMode ? "#26a641" : "#30a14e";
+  return darkMode ? "#39d353" : "#216e39";
 };
 
 const getMonthLabel = (monthIndex: number): string => {
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   return monthNames[monthIndex];
 };
 
-const groupDataByWeeks = (data: ContributionData[]): { [key: string]: ContributionData[][] } => {
+const groupDataByWeeks = (
+  data: ContributionData[]
+): { [key: string]: ContributionData[][] } => {
   const weeksByMonth: { [key: string]: ContributionData[][] } = {};
   let currentWeek: ContributionData[] = [];
 
@@ -75,7 +90,7 @@ const groupDataByWeeks = (data: ContributionData[]): { [key: string]: Contributi
   Object.keys(weeksByMonth).forEach((monthKey) => {
     weeksByMonth[monthKey].forEach((week) => {
       while (week.length < 7) {
-        week.push({ day: '', value: 0 });
+        week.push({ day: "", value: 0 });
       }
     });
   });
@@ -86,7 +101,9 @@ const groupDataByWeeks = (data: ContributionData[]): { [key: string]: Contributi
 export default function Home() {
   const [level, setLevel] = useState<number>(1);
   const [data, setData] = useState<ContributionData[]>([]);
-  const [weeksByMonth, setWeeksByMonth] = useState<{ [key: string]: ContributionData[][] }>({});
+  const [weeksByMonth, setWeeksByMonth] = useState<{
+    [key: string]: ContributionData[][];
+  }>({});
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
   useEffect(() => {
@@ -103,16 +120,26 @@ export default function Home() {
 
   const toggleDarkMode = () => {
     setDarkMode((prevMode) => !prevMode);
-    document.documentElement.classList.toggle('dark');
+    document.documentElement.classList.toggle("dark");
   };
 
   return (
     <div className="container">
       <div className="content">
-        <h1>GitHub Contributions Chart</h1>
-        <label htmlFor="level">Coding Level (1-10):</label>
+        <h1>GitHub Contributions Graph Faker</h1>
+        <h2>Brag with Your GitHub Contributions 🚀</h2>
+
+        <p>Stand Out Instantly 🌟</p>
+        <p>Showcase an impressive GitHub activity streak effortlessly. </p>
+
+        <p  className="mb-10">
+          Decide how intense you want your graph to be or opt for a &quot;no
+          coder&quot; vibe.
+        </p>
+
+        <label className="mr-3" htmlFor="level">Coding Level (1-10):</label>
         <input
-          type="number"
+          type="range"
           id="level"
           name="level"
           min="1"
@@ -120,22 +147,30 @@ export default function Home() {
           value={level}
           onChange={handleChange}
         />
-        <button
-          onClick={toggleDarkMode}
-          className="mt-2 p-2 bg-blue-500 text-white rounded-md"
+        <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+
+        <div
+          className={`${styles.tableContainer} ${
+            darkMode ? styles.tableDark : styles.tableLight
+          } rounded-md`}
         >
-          {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        </button>
-        <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead>
               <tr>
                 {Object.keys(weeksByMonth)
                   .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
                   .map((monthKey) => {
-                    const monthIndex = parseInt(monthKey.split('-')[1], 10) - 1;
+                    const monthIndex = parseInt(monthKey.split("-")[1], 10) - 1;
                     return (
-                      <th key={monthKey} colSpan={weeksByMonth[monthKey].length}>
+                      <th
+                        key={monthKey}
+                        colSpan={weeksByMonth[monthKey].length}
+                        className={
+                          darkMode
+                            ? styles.monthHeaderDark
+                            : styles.monthHeaderLight
+                        }
+                      >
                         {getMonthLabel(monthIndex)}
                       </th>
                     );
@@ -148,13 +183,18 @@ export default function Home() {
                   .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
                   .flatMap((monthKey) =>
                     weeksByMonth[monthKey].map((week, weekIndex) => (
-                      <td key={`${monthKey}-${weekIndex}`} className={styles.weekCell}>
+                      <td
+                        key={`${monthKey}-${weekIndex}`}
+                        className={styles.weekCell}
+                      >
                         <div className={styles.weekGrid}>
                           {week.map((day, dayIndex) => (
                             <div
                               key={dayIndex}
                               className={styles.dayCell}
-                              style={{ backgroundColor: getColor(day.value, darkMode) }}
+                              style={{
+                                backgroundColor: getColor(day.value, darkMode),
+                              }}
                               title={`Date: ${day.day}, Contributions: ${day.value}`}
                             ></div>
                           ))}
@@ -165,16 +205,41 @@ export default function Home() {
               </tr>
             </tbody>
           </table>
+          <div
+            className={`${styles.legend} ${
+              darkMode ? styles.monthHeaderDark : styles.monthHeaderLight
+            }`}
+          >
+            <span>Less</span>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#2d333b" : "#ebedf0" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#0e4429" : "#9be9a8" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#006d32" : "#40c463" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#26a641" : "#30a14e" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#39d353" : "#216e39" }}
+            ></div>
+            <span>More</span>
+          </div>
         </div>
-        <div className={styles.legend}>
-          <span>Less</span>
-          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#2d333b' : '#ebedf0' }}></div>
-          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#0e4429' : '#9be9a8' }}></div>
-          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#006d32' : '#40c463' }}></div>
-          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#26a641' : '#30a14e' }}></div>
-          <div className={styles.legendColor} style={{ backgroundColor: darkMode ? '#39d353' : '#216e39' }}></div>
-          <span>More</span>
-        </div>
+      </div>
+      <div className="footer">
+        <p>
+          Made with ☕ by{" "}
+          <a href="https://x.com/sailing_dev">Sailing_dev</a>
+        </p>
       </div>
     </div>
   );

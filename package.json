@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.5",
     "@nivo/calendar": "^0.87.0",
     "faker": "^6.6.6",
     "next": "14.2.5",

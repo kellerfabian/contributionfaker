@@ -32,3 +32,16 @@ input[type='number'] {
 .chart-container {
   @apply h-96;
 }
+
+/* 
+ Darkmodel Toggles
+*/
+.light-mode {
+  background-color: white;
+  color: black;
+}
+
+.dark-mode {
+  background-color: black;
+  color: white;
+}

@@ -80,3 +80,19 @@
   margin: 0 2px;
   border: 1px solid #ddd;
 }
+
+.tableLight {
+  background-color: white;
+}
+
+.tableDark {
+  background-color: #0d1117; 
+}
+
+.monthHeaderLight {
+  color: black; /* Light mode month header color */
+}
+
+.monthHeaderDark {
+  color: white; /* Dark mode month header color */
+}
