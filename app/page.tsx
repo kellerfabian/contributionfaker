@@ -103,10 +103,11 @@ export default function Home() {
 
   const toggleDarkMode = () => {
     setDarkMode((prevMode) => !prevMode);
+    document.documentElement.classList.toggle('dark');
   };
 
   return (
-    <div className={`container ${darkMode ? 'dark' : ''}`}>
+    <div className="container">
       <div className="content">
         <h1>GitHub Contributions Chart</h1>
         <label htmlFor="level">Coding Level (1-10):</label>
