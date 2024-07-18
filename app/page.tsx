@@ -16,8 +16,11 @@ const generateData = (level: number): ContributionData[] => {
     let value = Math.round(Math.random() * level);
     if (level === 1 && Math.random() < 0.7) {
       value = 0; // 70% chance of having an empty day for level 1
-    } else if (level === 9 || level === 10) {
-      value = Math.max(1, value); // Ensure there are no empty days for levels 9 and 10
+    } else if (level === 13 || level === 14) {
+      value = Math.max(1, value); // Ensure there are no empty days for levels 14 and 15
+    }
+    else if (level === 15){
+      value = 4;
     }
     data.push({
       day: date.toISOString().split("T")[0],
@@ -64,26 +67,34 @@ const groupDataByWeeks = (
     const dayOfWeek = date.getDay(); // 0 (Sunday) to 6 (Saturday)
     const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
 
-    // Start a new week on Monday
-    if (dayOfWeek === 1 || currentWeek.length === 7) {
+    // Start a new week on Sunday (dayOfWeek === 0) or if the current week has 7 days
+    if (dayOfWeek === 0 || currentWeek.length === 7) {
       if (currentWeek.length) {
-        if (!weeksByMonth[monthKey]) {
-          weeksByMonth[monthKey] = [];
+        const firstDate = new Date(currentWeek[0].day);
+        const weekMonthKey = `${firstDate.getFullYear()}-${
+          firstDate.getMonth() + 1
+        }`;
+        if (!weeksByMonth[weekMonthKey]) {
+          weeksByMonth[weekMonthKey] = [];
         }
-        weeksByMonth[monthKey].push(currentWeek);
+        weeksByMonth[weekMonthKey].push(currentWeek);
       }
       currentWeek = [];
     }
+
     currentWeek.push(entry);
   });
 
+  // Push the last week if it has entries
   if (currentWeek.length) {
-    const date = new Date(currentWeek[0].day);
-    const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-    if (!weeksByMonth[monthKey]) {
-      weeksByMonth[monthKey] = [];
+    const firstDate = new Date(currentWeek[0].day);
+    const weekMonthKey = `${firstDate.getFullYear()}-${
+      firstDate.getMonth() + 1
+    }`;
+    if (!weeksByMonth[weekMonthKey]) {
+      weeksByMonth[weekMonthKey] = [];
     }
-    weeksByMonth[monthKey].push(currentWeek);
+    weeksByMonth[weekMonthKey].push(currentWeek);
   }
 
   // Ensure each week has 7 days, filling with empty days if necessary
@@ -107,7 +118,7 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
   useEffect(() => {
-    const newData = generateData(level);
+    const newData = generateData(level).reverse(); // Reverse the data
     setData(newData);
     const newWeeksByMonth = groupDataByWeeks(newData);
     setWeeksByMonth(newWeeksByMonth);
@@ -132,18 +143,20 @@ export default function Home() {
         <p>Stand Out Instantly 🌟</p>
         <p>Showcase an impressive GitHub activity streak effortlessly. </p>
 
-        <p  className="mb-10">
+        <p className="mb-10">
           Decide how intense you want your graph to be or opt for a &quot;no
           coder&quot; vibe.
         </p>
 
-        <label className="mr-3" htmlFor="level">Coding Level (1-10):</label>
+        <label className="mr-3" htmlFor="level">
+          Coding Level (no coder - maniac coder):
+        </label>
         <input
           type="range"
           id="level"
           name="level"
-          min="1"
-          max="10"
+          min="0"
+          max="15"
           value={level}
           onChange={handleChange}
         />
@@ -158,7 +171,7 @@ export default function Home() {
             <thead>
               <tr>
                 {Object.keys(weeksByMonth)
-                  .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                  .sort((a, b) => new Date(a).getTime() - new Date(b).getTime()) // Correct sorting direction
                   .map((monthKey) => {
                     const monthIndex = parseInt(monthKey.split("-")[1], 10) - 1;
                     return (
@@ -177,10 +190,11 @@ export default function Home() {
                   })}
               </tr>
             </thead>
+
             <tbody>
               <tr>
                 {Object.keys(weeksByMonth)
-                  .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                  .sort((a, b) => new Date(a).getTime() - new Date(b).getTime()) // Correct sorting direction
                   .flatMap((monthKey) =>
                     weeksByMonth[monthKey].map((week, weekIndex) => (
                       <td
@@ -237,8 +251,7 @@ export default function Home() {
       </div>
       <div className="footer">
         <p>
-          Made with ☕ by{" "}
-          <a href="https://x.com/sailing_dev">Sailing_dev</a>
+          Made with ☕ by <a href="https://x.com/sailing_dev">Sailing_dev</a>
         </p>
       </div>
     </div>

@@ -5,6 +5,7 @@
   --table-bg-color: #f6f8fa;
   --day-cell-bg-color: #ebedf0;
   --hover-border-color: #000000;
+  --day-cell-border-color: #e1e4e8;
 }
 
 .dark {
@@ -13,6 +14,7 @@
   --table-bg-color: #161b22;
   --day-cell-bg-color: #2d333b;
   --hover-border-color: #ffffff;
+  --day-cell-border-color: #21262d;
 }
 
 .container {
@@ -58,11 +60,13 @@
   border-radius: 3px;
   background-color: var(--day-cell-bg-color);
   transition: background-color 0.3s, border-color 0.3s;
+  border: 1px solid var(--day-cell-border-color); /* Changed from outline to border */
 }
 
 .dayCell:hover {
   border: 1px solid var(--hover-border-color);
 }
+
 
 .legend {
   display: flex;
