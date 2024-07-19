@@ -16,7 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>{children}
+
+
+      <script async src="https://gc.datafakery.io/tracker.js" data-ackee-server="https://gc.datafakery.io" data-ackee-domain-id="bfa7dff0-205d-4864-a389-9047cdc9e484"></script>
+      </body>
     </html>
   );
 }

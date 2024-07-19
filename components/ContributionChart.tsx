@@ -128,9 +128,10 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
     setWeeksByMonth(newWeeksByMonth);
   }, [level]);
 
+  const dayLabels = ["Mon", "", "Wed", "", "Fri", "", ""];
 
   return (
-    <div>
+    <div className="overflow-x-auto">
       <div
         id="contribution-chart"
         className={`p-3 ${styles.tableContainer} ${
@@ -140,6 +141,7 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
         <table className={styles.table}>
           <thead>
             <tr>
+              <th></th>
               {Object.keys(weeksByMonth)
                 .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
                 .map((monthKey) => {
@@ -160,62 +162,79 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
                 })}
             </tr>
           </thead>
-
           <tbody>
-            <tr>
-              {Object.keys(weeksByMonth)
-                .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-                .flatMap((monthKey) =>
-                  weeksByMonth[monthKey].map((week, weekIndex) => (
-                    <td
-                      key={`${monthKey}-${weekIndex}`}
-                      className={styles.weekCell}
-                    >
-                      <div className={styles.weekGrid}>
-                        {week.map((day, dayIndex) => (
-                          <div
-                            key={dayIndex}
-                            className={styles.dayCell}
-                            style={{
-                              backgroundColor: getColor(day.value, darkMode),
-                            }}
-                            title={`Date: ${day.day}, Contributions: ${day.value}`}
-                          ></div>
-                        ))}
-                      </div>
-                    </td>
-                  ))
-                )}
-            </tr>
+            {dayLabels.map((label, index) => (
+              <tr key={index}>
+                <td
+                  className={
+                    darkMode ? styles.dayLabelDark : styles.dayLabelLight
+                  }
+                >
+                  {label}
+                </td>
+                {Object.keys(weeksByMonth)
+                  .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                  .flatMap((monthKey) =>
+                    weeksByMonth[monthKey].map((week, weekIndex) => (
+                      <td
+                        key={`${monthKey}-${weekIndex}-${index}`}
+                        className={styles.weekCell}
+                      >
+                        <div
+                          className={styles.dayCell}
+                          style={{
+                            backgroundColor: getColor(
+                              week[index]?.value || 0,
+                              darkMode
+                            ),
+                          }}
+                          title={`Date: ${
+                            week[index]?.day || "N/A"
+                          }, Contributions: ${week[index]?.value || 0}`}
+                        ></div>
+                      </td>
+                    ))
+                  )}
+              </tr>
+            ))}
           </tbody>
         </table>
         <div
-          className={`m-3 ${styles.legend} ${
+          className={`mt-2 flex justify-between items-center ${
             darkMode ? styles.monthHeaderDark : styles.monthHeaderLight
           }`}
         >
-          <span>Less</span>
-          <div
-            className={styles.legendColor}
-            style={{ backgroundColor: darkMode ? "#2d333b" : "#ebedf0" }}
-          ></div>
-          <div
-            className={styles.legendColor}
-            style={{ backgroundColor: darkMode ? "#0e4429" : "#9be9a8" }}
-          ></div>
-          <div
-            className={styles.legendColor}
-            style={{ backgroundColor: darkMode ? "#006d32" : "#40c463" }}
-          ></div>
-          <div
-            className={styles.legendColor}
-            style={{ backgroundColor: darkMode ? "#26a641" : "#30a14e" }}
-          ></div>
-          <div
-            className={styles.legendColor}
-            style={{ backgroundColor: darkMode ? "#39d353" : "#216e39" }}
-          ></div>
-          <span>More</span>
+          <a
+            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn how we count contributions
+          </a>
+          <div className={`${styles.legend} pr-5` }>
+            <span>Less</span>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#2d333b" : "#ebedf0" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#0e4429" : "#9be9a8" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#006d32" : "#40c463" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#26a641" : "#30a14e" }}
+            ></div>
+            <div
+              className={styles.legendColor}
+              style={{ backgroundColor: darkMode ? "#39d353" : "#216e39" }}
+            ></div>
+            <span>More</span>
+          </div>
         </div>
       </div>
     </div>

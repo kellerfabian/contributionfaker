@@ -34,28 +34,23 @@ const Home = () => {
     <div className="container">
       <div className="content">
         <h1>GitHub Contributions Graph Faker</h1>
-        <h2>Brag with Your GitHub Contributions 🚀</h2>
+        <h2>Brag with Your GitHub Contributions 🚀 Stand Out Instantly 😉</h2>
+        <p className="mb-10">Showcase an impressive GitHub activity streak effortlessly. </p>
 
-        <p>Stand Out Instantly 🌟</p>
-        <p>Showcase an impressive GitHub activity streak effortlessly. </p>
-
-        <p className="mb-10">
-          Decide how intense you want your graph to be or opt for a &quot;no
-          coder&quot; vibe.
-        </p>
-
-        <label className="mr-3" htmlFor="level">
-          Coding Level (no coder - maniac coder):
-        </label>
-        <input
-          type="range"
-          id="level"
-          name="level"
-          min="0"
-          max="15"
-          value={level}
-          onChange={handleChange}
-        />
+        <div className="flex items-center space-x-3">
+          <label htmlFor="level">No Coder</label>
+          <input
+            type="range"
+            id="level"
+            name="level"
+            min="0"
+            max="15"
+            value={level}
+            onChange={handleChange}
+            className="flex-grow"
+          />
+          <label htmlFor="level">10x Maniac Coder</label>
+        </div>
 
         <div className="flex space-x-4 mt-2">
           <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -68,7 +63,11 @@ const Home = () => {
           </button>
         </div>
 
-        <ContributionChart level={level} darkMode={darkMode} />
+        <div className="w-full overflow-x-auto py-4">
+  <div className="">
+    <ContributionChart level={level} darkMode={darkMode} />
+  </div>
+</div>
       </div>
       <div className="footer  text-gray-500">
         <p>
