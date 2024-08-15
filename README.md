@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Fake GitHub Contribution Generator
+
+This open-source project is built with [Next.js](https://nextjs.org/) and allows users to generate fake GitHub contribution charts. You can customize the chart's contribution frequency and appearance. It's a fun tool to visualize and experiment with GitHub contribution graphs without affecting real accounts.
+![Screenshot 2](screenshot2.png)
+
+## Demo
+
+[Live Demo](https://github-contributions-faker.vercel.app/)
+
+![Screenshot 1](screenshot1.png)
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running, follow these steps:
+
+## Installation
+
+    Clone the repository:
 
 ```bash
+git clone https://github.com/kellerfabian/contributionfaker.git
+cd contributionfaker
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 to view the project in your browser.
+Building for Production
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
-## Learn More
+- Fork the Project
+- Create your Feature Branch (git checkout -b feature/AmazingFeature)
+- Commit your Changes (git commit -m 'Add some AmazingFeature')
+- Push to the Branch (git push origin feature/AmazingFeature)
+- Open a Pull Request
 
-To learn more about Next.js, take a look at the following resources:
+# License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Distributed under the MIT License. See LICENSE for more information.
+Contact
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+KellerFabian - @sailing_dev

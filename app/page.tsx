@@ -3,8 +3,10 @@ import { useState } from "react";
 import DarkModeToggle from "../components/DarkModeToggle";
 import ContributionChart from "../components/ContributionChart";
 import html2canvas from "html2canvas";
+import Link from "next/link";
+import { GithubIcon } from "@/components/GithubLogo";
 
-const Home = () => {
+export default function Home() {
   const [level, setLevel] = useState<number>(1);
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
@@ -35,7 +37,9 @@ const Home = () => {
       <div className="content">
         <h1>GitHub Contributions Graph Faker</h1>
         <h2>Brag with Your GitHub Contributions 🚀 Stand Out Instantly 😉</h2>
-        <p className="mb-10">Showcase an impressive GitHub activity streak effortlessly. </p>
+        <p className="mb-10">
+          Showcase an impressive GitHub activity streak effortlessly.{" "}
+        </p>
 
         <div className="flex items-center space-x-3">
           <label htmlFor="level">No Coder</label>
@@ -64,18 +68,32 @@ const Home = () => {
         </div>
 
         <div className="w-full overflow-x-auto py-4">
-  <div className="">
-    <ContributionChart level={level} darkMode={darkMode} />
-  </div>
-</div>
+          <div className="">
+            <ContributionChart level={level} darkMode={darkMode} />
+          </div>
+        </div>
       </div>
-      <div className="footer  text-gray-500">
-        <p>
-          Made with ☕ by <a href="https://x.com/sailing_dev">Sailing_dev</a>
-        </p>
+      <div className="footer text-gray-500 mt-4">
+        <div className="flex items-center space-x-2 ">
+          <p>
+            Made with ☕ by{" "}
+            <Link
+              href="https://x.com/sailing_dev"
+              className="text-blue-500"
+              target="_blank"
+            >
+              Sailing_dev
+            </Link>
+          </p>
+          <Link
+            href="https://github.com/kellerfabian/contributionfaker"
+            className="ml-auto"
+            target="_blank"
+          >
+            <GithubIcon />
+          </Link>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Home;
+}
