@@ -1,18 +1,24 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import DarkModeToggle from "../components/DarkModeToggle";
 import ContributionChart from "../components/ContributionChart";
 import html2canvas from "html2canvas";
 import Link from "next/link";
 import { GithubIcon } from "@/components/GithubLogo";
+import Image from "next/image";
 
 export default function Home() {
-  const [level, setLevel] = useState<number>(1);
-  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [level, setLevel] = useState<number>(3);
+  const [darkMode, setDarkMode] = useState<boolean>(true);
+  const [resetKey, setResetKey] = useState<number>(0);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newLevel = parseInt(event.target.value);
     setLevel(newLevel);
+  };
+
+  const handleReset = () => {
+    setResetKey((prevKey) => prevKey + 1);
   };
 
   const toggleDarkMode = () => {
@@ -65,11 +71,33 @@ export default function Home() {
           >
             Download Chart
           </button>
+
+          <button
+            onClick={handleReset}
+            className="mt-2 p-2 text-white rounded-md flex items-center"
+          >
+            Reset
+          </button>
         </div>
 
         <div className="w-full overflow-x-auto py-4">
           <div className="">
-            <ContributionChart level={level} darkMode={darkMode} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <ContributionChart
+                resetKey={resetKey}
+                level={level}
+                darkMode={darkMode}
+              />
+            </Suspense>
+          </div>
+
+          <div className="flex justify-end   mt-4">
+            <Image
+              src="/clicktodraw.png"
+              alt="Click and hold your mouse on a cell to draw"
+              width={200}
+              height={150}
+            />
           </div>
         </div>
       </div>

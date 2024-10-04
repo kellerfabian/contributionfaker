@@ -9,15 +9,29 @@ interface ContributionData {
 interface ContributionChartProps {
   level: number;
   darkMode: boolean;
+  resetKey: number;
 }
 
 const generateData = (level: number): ContributionData[] => {
   const today = new Date();
   const data: ContributionData[] = [];
-  for (let i = 0; i < 365; i++) {
+
+  // Calculate the first day of the current year and last year
+  const firstDayOfCurrentYear = new Date(today.getFullYear(), 0, 1);
+  const firstDayOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+
+  // Find the day of the week (0 = Sunday, 6 = Saturday) for the first day of last year
+  const firstDayOfWeekLastYear = firstDayOfLastYear.getDay();
+
+  // We need to add extra days to cover the entire first week of the previous year
+  const extraDays = firstDayOfWeekLastYear === 0 ? 0 : firstDayOfWeekLastYear;
+
+  // Generate data for 365 + extraDays
+  for (let i = 0; i < 365 + extraDays; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
     let value = Math.round(Math.random() * level);
+
     if (level === 1 && Math.random() < 0.7) {
       value = 0; // 70% chance of having an empty day for level 1
     } else if (level === 13 || level === 14) {
@@ -25,11 +39,13 @@ const generateData = (level: number): ContributionData[] => {
     } else if (level === 15) {
       value = 4;
     }
+
     data.push({
       day: date.toISOString().split("T")[0],
       value: value,
     });
   }
+
   return data;
 };
 
@@ -115,18 +131,55 @@ const groupDataByWeeks = (
 const ContributionChart: React.FC<ContributionChartProps> = ({
   level,
   darkMode,
+  resetKey,
 }) => {
   const [data, setData] = useState<ContributionData[]>([]);
   const [weeksByMonth, setWeeksByMonth] = useState<{
     [key: string]: ContributionData[][];
   }>({});
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [currentColor, setCurrentColor] = useState<number | null>(null);
 
   useEffect(() => {
     const newData = generateData(level).reverse();
     setData(newData);
     const newWeeksByMonth = groupDataByWeeks(newData);
     setWeeksByMonth(newWeeksByMonth);
-  }, [level]);
+  }, [level, resetKey]);
+
+  const handleMouseDown = (day: ContributionData) => {
+    setIsDrawing(true);
+
+    // Determine the initial color based on the starting cell's current value
+    if (day.value === 0) {
+      const newValue = Math.floor(Math.random() * level) + 1; // Random value between 1 and level
+      setCurrentColor(newValue); // Set current drawing color
+      day.value = newValue; // Set initial cell to random value
+    } else {
+      setCurrentColor(0); // Set current drawing color to 0 (clearing)
+      day.value = 0; // Clear the initial cell
+    }
+
+    setData([...data]); // Update the data
+  };
+
+  const handleMouseMove = (day: ContributionData) => {
+    if (isDrawing) {
+      day.value = currentColor as number; // Apply the current color to the cell being hovered
+      setData([...data]); // Update the data while dragging
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
 
   const dayLabels = ["Mon", "", "Wed", "", "Fri", "", ""];
 
@@ -169,6 +222,8 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
                   className={
                     darkMode ? styles.dayLabelDark : styles.dayLabelLight
                   }
+                  onMouseDown={(e) => e.stopPropagation()} // Prevent mouse events on labels
+                  onMouseMove={(e) => e.stopPropagation()} // Prevent mouse events on labels
                 >
                   {label}
                 </td>
@@ -191,6 +246,12 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
                           title={`Date: ${
                             week[index]?.day || "N/A"
                           }, Contributions: ${week[index]?.value || 0}`}
+                          onMouseDown={() =>
+                            week[index]?.day && handleMouseDown(week[index])
+                          }
+                          onMouseMove={() =>
+                            week[index]?.day && handleMouseMove(week[index])
+                          }
                         ></div>
                       </td>
                     ))
@@ -211,7 +272,7 @@ const ContributionChart: React.FC<ContributionChartProps> = ({
           >
             Learn how we count contributions
           </a>
-          <div className={`${styles.legend} pr-5` }>
+          <div className={`${styles.legend} pr-5`}>
             <span>Less</span>
             <div
               className={styles.legendColor}
