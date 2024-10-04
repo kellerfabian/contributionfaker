@@ -6,11 +6,13 @@ import html2canvas from "html2canvas";
 import Link from "next/link";
 import { GithubIcon } from "@/components/GithubLogo";
 import Image from "next/image";
+import { ArrowDownCircleIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
   const [level, setLevel] = useState<number>(3);
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [resetKey, setResetKey] = useState<number>(0);
+  const [textToDraw, setTextToDraw] = useState<string>("");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newLevel = parseInt(event.target.value);
@@ -38,17 +40,27 @@ export default function Home() {
     }
   };
 
-  return (
-    <div className="container">
-      <div className="content">
-        <h1>GitHub Contributions Graph Faker</h1>
-        <h2>Brag with Your GitHub Contributions 🚀 Stand Out Instantly 😉</h2>
-        <p className="mb-10">
-          Showcase an impressive GitHub activity streak effortlessly.{" "}
-        </p>
+  const handleTextToDrawChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setTextToDraw(event.target.value);
+  };
 
-        <div className="flex items-center space-x-3">
-          <label htmlFor="level">No Coder</label>
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="content text-center">
+        <h1 className="text-3xl font-bold mb-2">
+          GitHub Contributions Graph Faker
+        </h1>
+        <h2 className="text-xl text-gray-400 mb-6">
+          Brag with Your GitHub Contributions 🚀 Stand Out Instantly 😉
+        </h2>
+
+        {/* Level Slider */}
+        <div className="flex items-center justify-center space-x-4 mb-6">
+          <label htmlFor="level" className="text-gray-400">
+            No Coder
+          </label>
           <input
             type="range"
             id="level"
@@ -59,50 +71,72 @@ export default function Home() {
             onChange={handleChange}
             className="flex-grow"
           />
-          <label htmlFor="level">10x Maniac Coder</label>
+          <label htmlFor="level" className="text-gray-400">
+            10x Maniac Coder
+          </label>
         </div>
 
-        <div className="flex space-x-4 mt-2">
-          <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-
-          <button
-            onClick={handleScreenshot}
-            className="mt-2 p-2 bg-blue-500 text-white rounded-md flex items-center"
-          >
-            Download Chart
-          </button>
-
-          <button
-            onClick={handleReset}
-            className="mt-2 p-2 text-white rounded-md flex items-center"
-          >
-            Reset
-          </button>
-        </div>
-
+        {/* Contribution Chart */}
         <div className="w-full overflow-x-auto py-4">
-          <div className="">
-            <Suspense fallback={<div>Loading...</div>}>
-              <ContributionChart
-                resetKey={resetKey}
-                level={level}
-                darkMode={darkMode}
-              />
-            </Suspense>
-          </div>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ContributionChart
+              resetKey={resetKey}
+              level={level}
+              darkMode={darkMode}
+              providedText={textToDraw}
+            />
 
-          <div className="flex justify-end   mt-4">
+            {/* Buttons and Dark Mode Toggle */}
+            <div className="flex justify-left space-x-4 mt-2 ml-3">
+              <DarkModeToggle
+                darkMode={darkMode}
+                toggleDarkMode={toggleDarkMode}
+              />
+
+              <button
+                onClick={handleScreenshot}
+                // className="h-10 px-4 bg-blue-500 text-white rounded-md flex items-center justify-center"
+              >
+                <ArrowDownCircleIcon className="h-5 w-5 mr-2" />
+              </button>
+
+              <button
+                onClick={handleReset}
+                // className="h-10 px-4 text-white rounded-md flex items-center justify-center"
+              >
+                <ArrowPathIcon className="h-5 w-5 mr-2" />
+              </button>
+            </div>
+          </Suspense>
+        </div>
+
+        {/* Text Input for Drawing and Click to Draw Image in One Row */}
+        <div className="w-full py-4 flex justify-between items-center space-x-4">
+          <div className="flex-shrink-0">
             <Image
               src="/clicktodraw.png"
               alt="Click and hold your mouse on a cell to draw"
-              width={200}
+              width={300}
               height={150}
             />
           </div>
+          <input
+            type="text"
+            className={`flex-grow ml-5 p-3 text-center border ${
+              darkMode
+                ? "bg-gray-800 text-white border-gray-700"
+                : "bg-white text-black border-gray-300"
+            } rounded-md`}
+            placeholder="Type here to draw"
+            value={textToDraw}
+            onChange={handleTextToDrawChange}
+          />
         </div>
       </div>
-      <div className="footer text-gray-500 mt-4">
-        <div className="flex items-center space-x-2 ">
+
+      {/* Footer */}
+      <div className="footer text-gray-500 mt-8">
+        <div className="flex items-center justify-center space-x-2">
           <p>
             Made with ☕ by{" "}
             <Link
