@@ -146,14 +146,6 @@ export default function Home() {
             >
               Sailing_dev
             </Link>
-            {" and "}
-            <Link
-              href="https://datafakery.io"
-              className="text-blue-500"
-              target="_blank"
-            >
-              DataFakery
-            </Link>
           </p>
           <Link
             href="https://github.com/kellerfabian/contributionfaker"
